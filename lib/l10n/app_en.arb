@@ -1,0 +1,49 @@
+
+{
+  "@@locale": "en",
+  "appName": "EduSnap",
+  "list": "List",
+  "settings": "Settings",
+  "add": "Add",
+  "edit": "Edit",
+  "save": "Save",
+  "back": "Back",
+  "title": "Title",
+  "note": "Note",
+  "addPhoto": "Add photo",
+  "changePhoto": "Change photo",
+  "gallery": "Gallery",
+  "camera": "Camera",
+  "cameraAccessNeeded": "Camera access is needed to take a photo.",
+  "photoLibraryAccessNeeded": "Photo library access is needed to choose a photo.",
+  "notNow": "Not now",
+  "openSettings": "Open Settings",
+  "titleMissing": "Title is missing",
+  "ok": "OK",
+  "noPhoto": "No photo",
+  "emptyValue": "-",
+  "noEntries": "No entries yet. Tap + to add one.",
+  "createdOn": "Created on {date}",
+  "@createdOn": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "language": "Language",
+  "storageUsage": "Storage usage",
+  "storageUsed": "{size} KB used",
+  "@storageUsed": {
+    "placeholders": {
+      "size": { "type": "String" }
+    }
+  },
+  "formatData": "Format / Clear Data",
+  "confirmClearTitle1": "Clear all data?",
+  "confirmClearMsg1": "This will delete all journal entries and photos.",
+  "confirmClearTitle2": "Are you absolutely sure?",
+  "confirmClearMsg2": "This action cannot be undone.",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "version": "Version",
+  "buildNumber": "Build number"
+}

@@ -1,13 +1,18 @@
+// lib\Pages\HomePage\HomePage.dart
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 import '../../Component/JournalCard/JournalCard.dart';
 import '../../Models/JournalEntry.dart';
+import '../../Utils/AppLocaleController.dart';
 import '../Add/AddPage.dart';
 import '../Detail/DetailPage.dart';
 import '../Settings/SettingsPage.dart';
 import 'HomePageController.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final AppLocaleController localeController;
+
+  const HomePage({super.key, required this.localeController});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -15,6 +20,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final HomePageController _controller = HomePageController();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.load();
+  }
 
   @override
   void dispose() {
@@ -28,7 +39,7 @@ class _HomePageState extends State<HomePage> {
       MaterialPageRoute(builder: (_) => const AddPage()),
     );
     if (!mounted || entry == null) return;
-    _controller.insertAtTop(entry);
+    await _controller.insertAtTop(entry);
   }
 
   Future<void> _openDetail(int index, JournalEntry entry) async {
@@ -37,21 +48,31 @@ class _HomePageState extends State<HomePage> {
       MaterialPageRoute(builder: (_) => DetailPage(entry: entry)),
     );
     if (!mounted || updated == null) return;
-    _controller.updateEntry(index, updated);
+    await _controller.updateEntry(index, updated);
+  }
+
+  Future<void> _openSettings() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => SettingsPage(localeController: widget.localeController),
+      ),
+    );
+    if (!mounted) return;
+    await _controller.load();
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.settings),
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const SettingsPage()),
-          ),
+          onPressed: _openSettings,
         ),
-        title: const Text('Home'),
+        title: Text(l10n.list),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
@@ -62,7 +83,14 @@ class _HomePageState extends State<HomePage> {
       body: AnimatedBuilder(
         animation: _controller,
         builder: (context, _) {
+          if (_controller.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (_controller.entries.isEmpty) {
+            return Center(child: Text(l10n.noEntries));
+          }
           return ListView.builder(
+            padding: const EdgeInsets.symmetric(vertical: 8),
             itemCount: _controller.entries.length,
             itemBuilder: (context, index) {
               final entry = _controller.entries[index];
@@ -72,7 +100,7 @@ class _HomePageState extends State<HomePage> {
                 background: Container(
                   color: Colors.red,
                   alignment: Alignment.centerRight,
-                  padding: const EdgeInsets.only(right: 16),
+                  padding: const EdgeInsets.only(right: 20),
                   child: const Icon(Icons.delete, color: Colors.white),
                 ),
                 onDismissed: (_) => _controller.remove(entry),
