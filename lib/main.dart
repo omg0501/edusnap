@@ -46,12 +46,12 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    // Session 4 Challenge：可替換為你個人 Logo 提取的 5 個專屬色碼
-    const primaryColor = Color(0xFF025928);
-    const secondaryColor = Color(0xFFF25D27);
-    const accentColor = Color(0xFFD9653B);
-    const surfaceColor = Color(0xFFF2B29B);
-    const backgroundColor = Color(0xFFF2F2F2);
+    // Session 4 Challenge：從 EduSnap 專屬 Logo 提取的 5 組主題色碼
+    const primaryColor = Color(0xFF27397F); // 深靛藍（學士帽與背景主調）
+    const secondaryColor = Color(0xFF1E88C9); // 天空藍（相機機身與漸層）
+    const accentColor = Color(0xFFF5B027); // 暖金黃（Snap 字樣與流蘇）
+    const surfaceColor = Color(0xFFDCEAF7); // 淺冰藍（卡片與底部選單底色）
+    const backgroundColor = Color(0xFFF3F7FC); // 柔霧藍白（全局背景）
 
     final colorScheme = ColorScheme.fromSeed(
       seedColor: primaryColor,
@@ -99,12 +99,17 @@ class _MyAppState extends State<MyApp> {
                 foregroundColor: Colors.white,
               ),
             ),
+            outlinedButtonTheme: OutlinedButtonThemeData(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: primaryColor,
+                side: const BorderSide(color: secondaryColor),
+              ),
+            ),
             bottomSheetTheme: const BottomSheetThemeData(
               backgroundColor: surfaceColor,
             ),
           ),
           builder: (context, child) {
-            // 監聽折疊狀態：當完全展開 (fullyOpen) 時使用全螢幕布局
             return Container(
               width: double.infinity,
               height: double.infinity,
@@ -124,7 +129,6 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-/// 自動偵測目前是否在子頁面，決定是否顯示右側邊欄的原生返回按鈕
 class _DuoRouteObserver extends NavigatorObserver {
   final DuoLayoutController duoController;
   _DuoRouteObserver(this.duoController);
