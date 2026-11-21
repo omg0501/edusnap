@@ -1,16 +1,21 @@
-// lib\Pages\Add\AddPage.dart
 import 'dart:io';
 import 'package:flutter/material.dart';
-import '../../l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../Models/JournalEntry.dart';
+import '../../Utils/DuoLayoutController.dart';
+import '../../l10n/app_localizations.dart';
 import 'AddPageController.dart';
 
 class AddPage extends StatefulWidget {
   final JournalEntry? existingEntry;
+  final DuoLayoutController duoController;
 
-  const AddPage({super.key, this.existingEntry});
+  const AddPage({
+    super.key,
+    this.existingEntry,
+    required this.duoController,
+  });
 
   @override
   State<AddPage> createState() => _AddPageState();
@@ -24,9 +29,12 @@ class _AddPageState extends State<AddPage> {
   @override
   void initState() {
     super.initState();
-    _titleController = TextEditingController(text: widget.existingEntry?.title ?? '');
-    _noteController = TextEditingController(text: widget.existingEntry?.note ?? '');
-    _controller = AddPageController(initialImagePath: widget.existingEntry?.imagePath);
+    _titleController =
+        TextEditingController(text: widget.existingEntry?.title ?? '');
+    _noteController =
+        TextEditingController(text: widget.existingEntry?.note ?? '');
+    _controller =
+        AddPageController(initialImagePath: widget.existingEntry?.imagePath);
   }
 
   @override
@@ -121,16 +129,20 @@ class _AddPageState extends State<AddPage> {
     final l10n = AppLocalizations.of(context)!;
     final isEdit = widget.existingEntry != null;
 
-    return Scaffold(
-      appBar: AppBar(title: Text(isEdit ? l10n.edit : l10n.add)),
-      body: SafeArea(
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, _) {
-            final hasPhoto = _controller.imagePath != null &&
-                File(_controller.imagePath!).existsSync();
+    return AnimatedBuilder(
+      animation: Listenable.merge([_controller, widget.duoController]),
+      builder: (context, _) {
+        final duoRailActive = widget.duoController.isSideRailActive;
+        final hasPhoto = _controller.imagePath != null &&
+            File(_controller.imagePath!).existsSync();
 
-            return ListView(
+        return Scaffold(
+          appBar: AppBar(
+            automaticallyImplyLeading: !duoRailActive,
+            title: Text(isEdit ? l10n.edit : l10n.add),
+          ),
+          body: SafeArea(
+            child: ListView(
               padding: const EdgeInsets.all(16),
               children: [
                 TextFormField(
@@ -163,15 +175,16 @@ class _AddPageState extends State<AddPage> {
                 ),
                 const SizedBox(height: 16),
                 FilledButton(onPressed: _save, child: Text(l10n.save)),
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(l10n.back),
-                ),
+                if (!duoRailActive)
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(l10n.back),
+                  ),
               ],
-            );
-          },
-        ),
-      ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

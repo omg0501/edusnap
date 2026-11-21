@@ -1,9 +1,9 @@
-// lib\Pages\HomePage\HomePage.dart
 import 'package:flutter/material.dart';
-import '../../l10n/app_localizations.dart';
 import '../../Component/JournalCard/JournalCard.dart';
 import '../../Models/JournalEntry.dart';
 import '../../Utils/AppLocaleController.dart';
+import '../../Utils/DuoLayoutController.dart';
+import '../../l10n/app_localizations.dart';
 import '../Add/AddPage.dart';
 import '../Detail/DetailPage.dart';
 import '../Settings/SettingsPage.dart';
@@ -11,8 +11,13 @@ import 'HomePageController.dart';
 
 class HomePage extends StatefulWidget {
   final AppLocaleController localeController;
+  final DuoLayoutController duoController;
 
-  const HomePage({super.key, required this.localeController});
+  const HomePage({
+    super.key,
+    required this.localeController,
+    required this.duoController,
+  });
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -36,7 +41,9 @@ class _HomePageState extends State<HomePage> {
   Future<void> _openAdd() async {
     final entry = await Navigator.push<JournalEntry>(
       context,
-      MaterialPageRoute(builder: (_) => const AddPage()),
+      MaterialPageRoute(
+        builder: (_) => AddPage(duoController: widget.duoController),
+      ),
     );
     if (!mounted || entry == null) return;
     await _controller.insertAtTop(entry);
@@ -45,7 +52,12 @@ class _HomePageState extends State<HomePage> {
   Future<void> _openDetail(int index, JournalEntry entry) async {
     final updated = await Navigator.push<JournalEntry>(
       context,
-      MaterialPageRoute(builder: (_) => DetailPage(entry: entry)),
+      MaterialPageRoute(
+        builder: (_) => DetailPage(
+          entry: entry,
+          duoController: widget.duoController,
+        ),
+      ),
     );
     if (!mounted || updated == null) return;
     await _controller.updateEntry(index, updated);
@@ -55,7 +67,10 @@ class _HomePageState extends State<HomePage> {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => SettingsPage(localeController: widget.localeController),
+        builder: (_) => SettingsPage(
+          localeController: widget.localeController,
+          duoController: widget.duoController,
+        ),
       ),
     );
     if (!mounted) return;

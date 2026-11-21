@@ -1,16 +1,21 @@
-// lib\Pages\Detail\DetailPage.dart
 import 'dart:io';
 import 'package:flutter/material.dart';
-import '../../l10n/app_localizations.dart';
 import '../../Models/JournalEntry.dart';
 import '../../Utils/DateFormatter.dart';
+import '../../Utils/DuoLayoutController.dart';
+import '../../l10n/app_localizations.dart';
 import '../Add/AddPage.dart';
 import 'DetailPageController.dart';
 
 class DetailPage extends StatefulWidget {
   final JournalEntry entry;
+  final DuoLayoutController duoController;
 
-  const DetailPage({super.key, required this.entry});
+  const DetailPage({
+    super.key,
+    required this.entry,
+    required this.duoController,
+  });
 
   @override
   State<DetailPage> createState() => _DetailPageState();
@@ -35,7 +40,10 @@ class _DetailPageState extends State<DetailPage> {
     final updated = await Navigator.push<JournalEntry>(
       context,
       MaterialPageRoute(
-        builder: (_) => AddPage(existingEntry: _controller.entry),
+        builder: (_) => AddPage(
+          existingEntry: _controller.entry,
+          duoController: widget.duoController,
+        ),
       ),
     );
     if (!mounted || updated == null) return;
@@ -47,14 +55,18 @@ class _DetailPageState extends State<DetailPage> {
     final l10n = AppLocalizations.of(context)!;
 
     return AnimatedBuilder(
-      animation: _controller,
+      animation: Listenable.merge([_controller, widget.duoController]),
       builder: (context, _) {
+        final duoRailActive = widget.duoController.isSideRailActive;
         final entry = _controller.entry;
         final hasPhoto =
             entry.imagePath != null && File(entry.imagePath!).existsSync();
 
         return Scaffold(
-          appBar: AppBar(title: Text(entry.title)),
+          appBar: AppBar(
+            automaticallyImplyLeading: !duoRailActive,
+            title: Text(entry.title),
+          ),
           body: SafeArea(
             child: ListView(
               padding: const EdgeInsets.all(16),
@@ -67,7 +79,10 @@ class _DetailPageState extends State<DetailPage> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(entry.title, style: Theme.of(context).textTheme.headlineMedium),
+                Text(
+                  entry.title,
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
                 const SizedBox(height: 16),
                 if (hasPhoto)
                   ClipRRect(
@@ -92,17 +107,22 @@ class _DetailPageState extends State<DetailPage> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Theme.of(context).colorScheme.outline),
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Text(entry.note.isEmpty ? l10n.emptyValue : entry.note),
+                  child: Text(
+                    entry.note.isEmpty ? l10n.emptyValue : entry.note,
+                  ),
                 ),
                 const SizedBox(height: 24),
                 TextButton(onPressed: _openEdit, child: Text(l10n.edit)),
-                TextButton(
-                  onPressed: () => Navigator.pop(context, entry),
-                  child: Text(l10n.back),
-                ),
+                if (!duoRailActive)
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, entry),
+                    child: Text(l10n.back),
+                  ),
               ],
             ),
           ),

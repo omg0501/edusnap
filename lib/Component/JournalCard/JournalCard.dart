@@ -35,7 +35,7 @@ class JournalCard extends StatelessWidget {
               : Container(
                   width: 56,
                   height: 56,
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.12),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
                   child: Icon(
                     Icons.image_not_supported_outlined,
                     color: Theme.of(context).colorScheme.primary,
